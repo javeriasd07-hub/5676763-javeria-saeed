@@ -1,0 +1,89 @@
+import java.io.File;
+import java.io.PrintWriter;
+import java.util.HashMap;
+import java.util.Scanner;
+
+public class SalesReport {
+    public static void main(String[] args) throws Exception {
+
+        // HashMap to store Product Sales
+        HashMap<String, Integer> productSales = new HashMap<>();
+
+        // File Reading
+        File salesFile = new File("C:\\Users\\ARComputers\\OneDrive\\Desktop\\ECOM_DATASHEET.txt");
+        Scanner fileReader = new Scanner(salesFile);
+
+        // Skip heading line
+        if (fileReader.hasNextLine()) {
+            fileReader.nextLine();
+        }
+
+        // Read file data line by line
+        while (fileReader.hasNextLine()) {
+
+            String currentLine = fileReader.nextLine().trim();
+
+            if (currentLine.isEmpty()) {
+                continue;
+            }
+
+            String[] data = currentLine.split("\\s+");
+
+            // Extract required values
+            String areaName = data[6];
+            String itemName = data[7] + " " + data[8];
+            int totalSale = Integer.parseInt(data[9]);
+
+            // Create key
+            String mapKey = areaName + " | " + itemName;
+
+            // Add sales into HashMap
+            productSales.put(mapKey,
+                    productSales.getOrDefault(mapKey, 0) + totalSale);
+        }
+
+        fileReader.close();
+
+        // Display sales summary
+        System.out.println("========== SALES REPORT ==========");
+
+        for (String key : productSales.keySet()) {
+            System.out.println(key + " -> Rs." + productSales.get(key));
+        }
+
+        // Add new sales entry
+        String addedEntry = "South | Product E";
+
+        productSales.put(addedEntry,
+                productSales.getOrDefault(addedEntry, 0) + 50);
+
+        System.out.println("\nNew Entry Added: " + addedEntry);
+
+        // Remove an entry
+        String deletedEntry = "North | Product D";
+
+        if (productSales.containsKey(deletedEntry)) {
+
+            productSales.remove(deletedEntry);
+
+            System.out.println("Entry Removed: " + deletedEntry);
+        }
+
+        // Write updated data into new file
+        PrintWriter outputWriter =
+                new PrintWriter(new File("SALES_SUMMARY.txt"));
+
+        outputWriter.println("Region & Product      | Total Sales");
+        outputWriter.println("------------------------------------");
+
+        for (String key : productSales.keySet()) {
+
+            outputWriter.println(
+                    key + " -> Rs." + productSales.get(key));
+        }
+
+        outputWriter.close();
+
+        System.out.println("\nUpdated file saved successfully!");
+    }
+}
